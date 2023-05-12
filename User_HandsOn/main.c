@@ -3,13 +3,17 @@
 #include "stm32f4xx_hal_usart.h"
 #include "stm32f4xx_hal_gpio.h"
 #include <string.h>
+#include <stdio.h>
 
 /*Function prototype for delay and UART2 configuration functions */
 void UART2_Configuration(void);
 void Delay_ms(volatile int time_ms);
 
 USART_HandleTypeDef UART_Handler; /*Create UART_InitTypeDef struct instance */
-char Message[] = "Welcome to Microcontrollers Lab\r\n"; /* Message to be transmitted through UART */
+char Message[] = "Welcome to Microcontrollers Lab, cnt = "; /* Message to be transmitted through UART */
+char data[50];
+int cnt = 0;
+char cnt_str[10];
 
 int main(void)
 {
@@ -17,8 +21,13 @@ int main(void)
 	UART2_Configuration(); /* Call UART2 initialization define below */
 	while(1)
 	{
-		HAL_USART_Transmit(&UART_Handler, (uint8_t *)Message, strlen(Message), 10);
+		strcpy(data, Message);  // Copy str1 into result
+		sprintf(cnt_str,"%d",cnt);
+		strcat(data, cnt_str);  // Concatenate str2 to result
+		strcat(data, "\r\n");  // Concatenate str2 to result
+		HAL_USART_Transmit(&UART_Handler, (uint8_t *)data, strlen(data), 10);
 		Delay_ms(100);
+		cnt++;
 	}
 }
 
