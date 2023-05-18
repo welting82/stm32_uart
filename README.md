@@ -14,16 +14,16 @@
 ## Wire connect:
 | TTL pin | MCU pin |
 |---------|---------|
-|   RX    |   PA2   |
-|   TX    |   PA3   |
+|   RX    |   PD5   |
+|   TX    |   PD6   |
 |   GND   |   GND   |
 
 ## Uart protocol:
-- Bard rate: 115200
+- Bard rate: 921600
 - Data bit: 8
 - Stop bit: 1
 - Parity: None
 
 ## Uart rx demo:
-![uart rx demo](demo/rx.png)
+![uart rx demo](demo/rx_pd56.png)
 
