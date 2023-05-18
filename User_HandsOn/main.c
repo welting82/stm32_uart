@@ -10,10 +10,12 @@ void UART2_Configuration(void);
 void Delay_ms(volatile int time_ms);
 
 USART_HandleTypeDef UART_Handler; /*Create UART_InitTypeDef struct instance */
-char Message[] = "Welcome to Microcontrollers Lab, cnt = "; /* Message to be transmitted through UART */
-char data[50];
-int cnt = 0;
-char cnt_str[10];
+uint8_t data[100] = "ferg3fg\r\n";
+
+// void HAL_USART_TxCpltCallback(USART_HandleTypeDef *husart)
+// {
+
+// }
 
 int main(void)
 {
@@ -21,35 +23,36 @@ int main(void)
 	UART2_Configuration(); /* Call UART2 initialization define below */
 	while(1)
 	{
-		strcpy(data, Message);  // Copy str1 into result
-		sprintf(cnt_str,"%d",cnt);
-		strcat(data, cnt_str);  // Concatenate str2 to result
-		strcat(data, "\r\n");  // Concatenate str2 to result
-		HAL_USART_Transmit(&UART_Handler, (uint8_t *)data, strlen(data), 10);
+		HAL_USART_Transmit(&UART_Handler, (uint8_t *)data, sizeof(data), 10);
 		Delay_ms(100);
-		cnt++;
 	}
 }
 
+// TODO:GPIO
+// void GPIO_LED_Conf(void)
+// {
+// 	GPIO_InitTypeDef LED_GPIO_Handler;
+// }
+
 void UART2_Configuration(void)
 {
-	__HAL_RCC_GPIOA_CLK_ENABLE(); /* Enable clock to PORTA - UART2 pins PA2 and PA3 */
+	__HAL_RCC_GPIOD_CLK_ENABLE(); /* Enable clock to PORTD - UART2 pins PD5 and PD6 */
 	__HAL_RCC_USART2_CLK_ENABLE(); /* Enable clock to UART2 module */
 	
 	GPIO_InitTypeDef UART2_GPIO_Handler; /*Create GPIO_InitTypeDef struct instance */
-	UART2_GPIO_Handler.Pin = GPIO_PIN_2 | GPIO_PIN_3; 
+	UART2_GPIO_Handler.Pin = GPIO_PIN_5 | GPIO_PIN_6;
 	UART2_GPIO_Handler.Mode = GPIO_MODE_AF_PP;
 	UART2_GPIO_Handler.Pull = GPIO_PULLUP;
 	UART2_GPIO_Handler.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 	UART2_GPIO_Handler.Alternate = GPIO_AF7_USART2;
-	HAL_GPIO_Init(GPIOA, &UART2_GPIO_Handler);
+	HAL_GPIO_Init(GPIOD, &UART2_GPIO_Handler);
 	//UART Configuration
 	UART_Handler.Instance = USART2;
-	UART_Handler.Init.BaudRate = 115200;
+	UART_Handler.Init.BaudRate = 921600;
 	UART_Handler.Init.Mode = UART_MODE_TX_RX;
 	UART_Handler.Init.WordLength = UART_WORDLENGTH_8B;
 	UART_Handler.Init.StopBits = UART_STOPBITS_1;
-	HAL_USART_Init(&UART_Handler);	
+	HAL_USART_Init(&UART_Handler);
 }
 
 /*Generate ms */
