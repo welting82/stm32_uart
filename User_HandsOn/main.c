@@ -1,7 +1,5 @@
 // ref: https://microcontrollerslab.com/uart-usart-communication-stm32f4-discovery-board-hal-uart-driver/
 #include "stm32f4xx_hal.h"
-#include "stm32f4xx_hal_usart.h"
-#include "stm32f4xx_hal_gpio.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -9,8 +7,9 @@
 void UART2_Configuration(void);
 void Delay_ms(volatile int time_ms);
 
-USART_HandleTypeDef UART_Handler; /*Create UART_InitTypeDef struct instance */
-uint8_t data[100] = "ferg3fg\r\n";
+UART_HandleTypeDef UART_Handler; /*Create UART_InitTypeDef struct instance */
+uint8_t data[100] = "1qaz\r\n";
+uint8_t input[100] = {0};
 
 // void HAL_USART_TxCpltCallback(USART_HandleTypeDef *husart)
 // {
@@ -21,9 +20,12 @@ int main(void)
 {
 	HAL_Init(); /* HAL library initialization */
 	UART2_Configuration(); /* Call UART2 initialization define below */
+	HAL_UART_Transmit(&UART_Handler, (uint8_t *)data, sizeof(data), 10);
+	HAL_UART_Receive (&UART_Handler, (uint8_t *)input, sizeof(input), 5000);
+    HAL_UART_Transmit(&UART_Handler, (uint8_t *)input, sizeof(input), 100);
 	while(1)
 	{
-		HAL_USART_Transmit(&UART_Handler, (uint8_t *)data, sizeof(data), 10);
+		// HAL_USART_Transmit(&UART_Handler, (uint8_t *)data, sizeof(data), 10);
 		Delay_ms(100);
 	}
 }
@@ -52,7 +54,7 @@ void UART2_Configuration(void)
 	UART_Handler.Init.Mode = UART_MODE_TX_RX;
 	UART_Handler.Init.WordLength = UART_WORDLENGTH_8B;
 	UART_Handler.Init.StopBits = UART_STOPBITS_1;
-	HAL_USART_Init(&UART_Handler);
+	HAL_UART_Init(&UART_Handler);
 }
 
 /*Generate ms */
