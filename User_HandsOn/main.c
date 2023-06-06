@@ -1,28 +1,24 @@
-// ref: https://microcontrollerslab.com/uart-usart-communication-stm32f4-discovery-board-hal-uart-driver/
 #include "stm32f4xx_hal.h"
 #include <string.h>
 #include <stdio.h>
 
+#define MAX_DATA_SIZE 100
 /*Function prototype for delay and UART2 configuration functions */
 void UART2_Configuration(void);
 void Clock_Configuration(void);
+void LED3_Configuration(void);
+void BTN_Configuration(void);
 void Delay_ms(volatile int time_ms);
 
 UART_HandleTypeDef huart2; /*Create UART_InitTypeDef struct instance */
-char RX_Buffer; //"Interrupt inputt"
-char rec_data[10]; //"receice data"
+char RX_Buffer; //"Interrupt input"
+char rec_data[MAX_DATA_SIZE]; //"receice data"
 char TX_Buffer[50] = "Hello World\r\n";
 uint8_t Uart2_Rx_Cnt = 0;
 uint8_t loop_cnt = 0;
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	// if(huart->Instance == huart2.Instance)
-	// {
-	// 	HAL_UART_Transmit_IT(huart, (uint8_t*)&RX_Buffer, sizeof(RX_Buffer));
-	// 	// HAL_UART_Receive_IT(huart, (uint8_t*)&RX_Buffer, 10);
-	// }
-
 	if((Uart2_Rx_Cnt == sizeof(rec_data)-2) || (RX_Buffer == '\r') || (RX_Buffer == '\n'))
 	{
 		rec_data[Uart2_Rx_Cnt] = '\r';
@@ -37,6 +33,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	{
 		rec_data[Uart2_Rx_Cnt++] = RX_Buffer;
 	}
+	HAL_GPIO_TogglePin(GPIOG,GPIO_PIN_13);
 	HAL_UART_Receive_IT(huart, (uint8_t*)&RX_Buffer, 1);
 }
 
@@ -44,24 +41,42 @@ int main(void)
 {
 	HAL_Init(); /* HAL library initialization */
 	Clock_Configuration();
+	LED3_Configuration();
+	BTN_Configuration();
 	UART2_Configuration(); /* Call UART2 initialization define below */
 	HAL_UART_Transmit(&huart2, (uint8_t*)&TX_Buffer, sizeof(TX_Buffer),0xffff);
 	HAL_UART_Receive_IT(&huart2, (uint8_t*)&RX_Buffer, 1);
 	while(1)
 	{
-		memset(TX_Buffer,0,sizeof(TX_Buffer));
-		sprintf(TX_Buffer,"Loop Cnt: %d,  Rx Cnt: %d\r\n",loop_cnt, Uart2_Rx_Cnt);
-		HAL_UART_Transmit(&huart2, (uint8_t*)&TX_Buffer, sizeof(TX_Buffer),0xFFFF);
-		loop_cnt++;
-		Delay_ms(500);
+		if(!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0))
+		{
+			memset(TX_Buffer,0,sizeof(TX_Buffer));
+			sprintf(TX_Buffer,"Loop Cnt: %d,  Rx Cnt: %d\r\n",loop_cnt, Uart2_Rx_Cnt);
+			HAL_UART_Transmit(&huart2, (uint8_t*)&TX_Buffer, sizeof(TX_Buffer),0xFFFF);
+			loop_cnt++;
+			Delay_ms(250);
+		}
 	}
 }
 
-// TODO:GPIO
-// void GPIO_LED_Conf(void)
-// {
-// 	GPIO_InitTypeDef LED_GPIO_Handler;
-// }
+void BTN_Configuration(void)
+{
+	__HAL_RCC_GPIOA_CLK_ENABLE(); //Enable clock to GPIOA
+	GPIO_InitTypeDef PushButton;  // declare a variable of type struct GPIO_InitTypeDef
+	PushButton.Mode = GPIO_MODE_INPUT; // set pin mode to input
+	PushButton.Pin = GPIO_PIN_0;  // select pin PA0 only
+	PushButton.Pull = GPIO_NOPULL; // set no internal pull-up or pull-down resistor
+	HAL_GPIO_Init(GPIOA, &PushButton); //  initialize PA0 pins by passing port name and address of PushButton struct
+}
+
+void LED3_Configuration(void)
+{
+    __HAL_RCC_GPIOG_CLK_ENABLE();
+    GPIO_InitTypeDef LED3_GPIO_Handler;
+    LED3_GPIO_Handler.Pin = GPIO_PIN_13;
+    LED3_GPIO_Handler.Mode = GPIO_MODE_OUTPUT_PP;
+    HAL_GPIO_Init(GPIOG, &LED3_GPIO_Handler);
+}
 
 void UART2_Configuration(void)
 {
