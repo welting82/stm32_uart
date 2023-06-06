@@ -39,7 +39,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_it.h"
-
+#include "stm32f4xx_hal.h"
+extern UART_HandleTypeDef huart2;
 /** @addtogroup STM32F4xx_HAL_Examples
   * @{
   */
@@ -173,6 +174,12 @@ void SysTick_Handler(void)
 /*void PPP_IRQHandler(void)
 {
 }*/
+
+
+void USART2_IRQHandler(void)
+{
+  HAL_UART_IRQHandler(&huart2);
+}
 
 /**
   * @}

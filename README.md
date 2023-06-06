@@ -25,5 +25,14 @@
 - Parity: None
 
 ## Uart rx demo:
+Show the specific word.
+
 ![uart rx demo](demo/rx_pd56.png)
 
+## Uart interrupt demo:
+Loop counter: 500 ms/per
+
+Rx counter: counter input characters, max (8 char)
+
+
+![uart interrupt demo](demo/interrupt.png)
