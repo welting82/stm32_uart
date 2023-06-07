@@ -5,4 +5,4 @@
 *.hex
 *.elf
 *.map
-settings.json
+.vscode/
