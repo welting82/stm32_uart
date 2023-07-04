@@ -41,6 +41,7 @@
 #include "stm32f4xx_it.h"
 #include "stm32f4xx_hal.h"
 extern UART_HandleTypeDef huart2;
+extern DMA_HandleTypeDef hdma_usart2_rx;
 /** @addtogroup STM32F4xx_HAL_Examples
   * @{
   */
@@ -174,6 +175,12 @@ void SysTick_Handler(void)
 /*void PPP_IRQHandler(void)
 {
 }*/
+
+
+void DMA1_Stream5_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(&hdma_usart2_rx);
+}
 
 
 void USART2_IRQHandler(void)

@@ -1,8 +1,0 @@
-*.d
-*.o
-*.lst
-*.bin
-*.hex
-*.elf
-*.map
-.vscode/

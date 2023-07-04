@@ -20,6 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
+extern DMA_HandleTypeDef hdma_usart2_rx;
 
 /** @addtogroup STM32F4xx_HAL_Driver
   * @{
@@ -91,6 +92,7 @@ void HAL_PPP_MspDeInit(void)
   {
     __HAL_RCC_GPIOD_CLK_ENABLE(); /* Enable clock to PORTD - UART2 pins PD5 and PD6 */
     __HAL_RCC_USART2_CLK_ENABLE(); /* Enable clock to UART2 module */
+    __HAL_RCC_DMA1_CLK_ENABLE();
 
     GPIO_InitTypeDef UART2_GPIO_Handler; /*Create GPIO_InitTypeDef struct instance */
     UART2_GPIO_Handler.Pin = GPIO_PIN_5 | GPIO_PIN_6;
@@ -101,6 +103,23 @@ void HAL_PPP_MspDeInit(void)
     HAL_GPIO_Init(GPIOD, &UART2_GPIO_Handler);
     HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(USART2_IRQn);
+
+
+    
+    hdma_usart2_rx.Instance = DMA1_Stream5;
+    hdma_usart2_rx.Init.Channel = DMA_CHANNEL_4;
+    hdma_usart2_rx.Init.Direction  = DMA_PERIPH_TO_MEMORY;
+    hdma_usart2_rx.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_usart2_rx.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_usart2_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_usart2_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+    hdma_usart2_rx.Init.Mode = DMA_NORMAL;
+    hdma_usart2_rx.Init.Priority = DMA_PRIORITY_LOW;
+    hdma_usart2_rx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    HAL_DMA_Init(&hdma_usart2_rx);
+    HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 0, 0);
+  	HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);
+    __HAL_LINKDMA(huart,hdmarx,hdma_usart2_rx);
   }
 }
 
